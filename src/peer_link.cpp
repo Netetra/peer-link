@@ -217,7 +217,10 @@ void esp_now_recv_task(void* args) {
             }
             if (info->des_addr == BROADCAST_MAC) {
                 bool result = esp_now_pairing(params->peer_id, params->peer_addr, info);
-                if (result) { continue; }
+                if (result) {
+                    delete info;
+                    continue;
+                }
             }
             std::vector<struct Message> messages;
             bool result = Frame::parse_message(info->payload, messages);
