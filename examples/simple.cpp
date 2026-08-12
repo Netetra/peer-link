@@ -8,7 +8,7 @@ const peer_id_t PEER_ID = 0x01;
 void peer_link_recv_cb(const peer_id_t peer_id, const std::vector<struct Message>& messages) {
     printf("id: 0x%02X\r\n", peer_id);
     for (struct Message message: messages) {
-        printf("type = %d, data = ", peer_id, message.type);
+        printf("type = %d, data = ", message.type);
         for (uint8_t byte : message.data) {
             printf("%02X, ", byte);
         }
