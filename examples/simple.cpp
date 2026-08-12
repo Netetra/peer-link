@@ -3,7 +3,7 @@
 #include <string>
 
 const uint8_t WIFI_CHANNEL = 14;
-const peer_id_t PEER_ID = 0x01;
+const peer_id_t PEER_ID = 0x12;
 
 void peer_link_recv_cb(const peer_id_t peer_id, const std::vector<struct Message>& messages) {
     printf("id: 0x%02X\r\n", peer_id);
