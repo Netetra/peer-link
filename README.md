@@ -36,9 +36,9 @@ void peer_link_recv_cb(const peer_id_t peer_id, const std::vector<struct Message
 ```cpp
 std::vector<struct Message> messages;
 std::string str = "Hello World!";
-struct Message gamepad_message = {
+struct Message message = {
     .type = 0xAB,
-    .data = std::vector(str.begin(), str.end())
+    .data = std::vector<uint8_t>(str.begin(), str.end())
 };
 messages.push_back(std::move(message));
 peer_link_send(BROADCAST_ID, messages);
