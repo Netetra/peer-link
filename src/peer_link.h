@@ -62,5 +62,6 @@ class Frame {
         static bool is_start_sof(const std::vector<uint8_t>& frame);
 };
 
+bool peer_link_is_peer_exist(peer_id_t peer_id);
 esp_err_t peer_link_send(const peer_id_t peer_id, const std::vector<struct Message>& messages);
 void print_peer_link_messages(const peer_id_t peer_id, const std::vector<struct Message>& messages);
