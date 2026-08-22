@@ -49,7 +49,7 @@ peer_link_send(BROADCAST_ID, messages);
 `peer_id`は宛先のESP32のIDを入れてください
 #### 例
 ```cpp
-bool arrive_peer = peer_link_is_peer_exist(TO_PEER_ID);
+bool arrive_peer = peer_link_is_peer_exist(peer_id);
   printf("arrive%d\r\n", arrive_peer);
 ```
 
