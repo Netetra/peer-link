@@ -44,6 +44,15 @@ messages.push_back(std::move(message));
 peer_link_send(BROADCAST_ID, messages);
 ```
 
+### peerの生存確認
+`peer_link_is_peer_exist(peer_id)`を呼び出すと確認できます
+`peer_id`は宛先のESP32のIDを入れてください
+#### 例
+```cpp
+bool arrive_peer = peer_link_is_peer_exist(TO_PEER_ID);
+  printf("arrive%d\r\n", arrive_peer);
+```
+
 ## メッセージについて
 メッセージは送受信する基本単位です。
 それぞれのメッセージは内容を識別するための値`type`を持っておりこの値を用いて`data`の中身を識別する形になります
