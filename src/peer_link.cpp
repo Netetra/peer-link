@@ -164,6 +164,14 @@ esp_err_t peer_link_send(const peer_id_t peer_id, const std::vector<struct Messa
     return result;
 }
 
+bool peer_link_is_peer_exist(peer_id_t peer_id) {
+  xSemaphoreTake(esp_now_mutex, portMAX_DELAY);
+  mac_addr_t mac_addr = id_to_mac(peer_id);
+  bool result = esp_now_is_peer_exist(mac_addr.data());
+  xSemaphoreGive(esp_now_mutex);
+  return result;
+}
+
 bool esp_now_pairing(const peer_id_t peer_id, const mac_addr_t peer_addr, struct ReceiveInfo *info) {
     if (Frame::is_beacon(info->payload)) {
         esp_err_t update_result = esp_now_update_peer_life(info->src_addr);
