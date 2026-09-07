@@ -1,14 +1,17 @@
 #include <Arduino.h>
 #include <peer_link.h>
-
-#include <string>
+#include <cstring>
 
 const uint8_t WIFI_CHANNEL = 14;
 const peer_id_t FROM_PEER_ID = 0x12;
 const peer_id_t TO_PEER_ID = 0x11;
 
-void peer_link_recv_cb(const peer_id_t peer_id,
-                       const std::vector<struct Message>& messages) {
+const char* TEXT = "Hello World!";
+
+void peer_link_recv_cb(
+  const peer_id_t peer_id,
+  const std::vector<struct Message>& messages
+) {
   printf("id: 0x%02X\r\n", peer_id);
   for (struct Message message : messages) {
     printf("type = %d, data = ", message.type);
@@ -22,13 +25,12 @@ void peer_link_recv_cb(const peer_id_t peer_id,
 void setup() { peer_link_task_init(WIFI_CHANNEL, FROM_PEER_ID); }
 
 void loop() {
-  std::vector<struct Message> messages;
-  std::string str = "Hello World!";
-  struct Message message = {
-      .type = 0xAB, .data = std::vector<uint8_t>(str.begin(), str.end())};
-  messages.push_back(std::move(message));
-  peer_link_send(TO_PEER_ID, messages);
-  bool arrive_peer = peer_link_is_peer_exist(TO_PEER_ID);
-  printf("arrive%d\r\n", arrive_peer);
+  if (peer_link_is_peer_exist(TO_PEER_ID)) {
+    std::vector<struct Message> messages;
+    struct Message message = {
+        .type = 0xAB, .data = std::vector<uint8_t>(TEXT, TEXT + std::strlen(TEXT))};
+    messages.push_back(std::move(message));
+    peer_link_send(TO_PEER_ID, messages);
+  }
   delay(1000);
 }
