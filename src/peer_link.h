@@ -5,9 +5,10 @@
 
 using peer_id_t = uint8_t;
 using mac_addr_t = std::array<uint8_t, ESP_NOW_ETH_ALEN>;
+using domain_t = std::array<uint8_t, 4>;
+using receive_cb_t = void (*)(const peer_id_t peer_id, const std::vector<struct Message>& messages);
 
 const mac_addr_t BROADCAST_MAC = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-const mac_addr_t PEER_BASE_MAC = { 0x02,  'n',  'n',  'c',  't', 0x00 }; // [5]: peer_id
 const peer_id_t BROADCAST_ID = 0xFF;
 const uint32_t ESP_NOW_BEACON_INTERVAL_MS = 500;
 const std::array<uint8_t, 2> SOF = { 0x55, 0xAA };
@@ -31,9 +32,10 @@ struct ReceiveInfo {
 struct ReceiveTaskParams {
     peer_id_t peer_id;
     mac_addr_t peer_addr;
+    receive_cb_t callback;
 };
 
-void peer_link_task_init(uint8_t channel, peer_id_t peer_id);
+void peer_link_init(uint8_t channel, domain_t domain, peer_id_t peer_id, receive_cb_t recv_cb);
 
 enum class FrameCode: uint8_t {
     Beacon = 0x01,

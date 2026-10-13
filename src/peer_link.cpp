@@ -14,6 +14,8 @@ const uint8_t ESP_NOW_BEACON_SEND_TASK_PRIORITY = 10;
 const uint32_t ESP_NOW_BEACON_WATCH_TASK_STACK_SIZE = 4096;
 const uint8_t ESP_NOW_BEACON_WATCH_TASK_PRIORITY = 10;
 
+mac_addr_t PEER_BASE_MAC = { 0x02,  0x00,  0x00,  0x00,  0x00, 0x00 }; // [5]: peer_id
+
 TaskHandle_t esp_now_recv_task_handle;
 TaskHandle_t esp_now_beacon_send_task_handle;
 TaskHandle_t esp_now_beacon_watch_task_handle;
@@ -21,8 +23,6 @@ TaskHandle_t esp_now_beacon_watch_task_handle;
 SemaphoreHandle_t esp_now_mutex;
 QueueHandle_t esp_now_recv_info_queue;
 QueueHandle_t esp_now_send_cb_status_mailbox;
-
-__attribute__((weak)) void peer_link_recv_cb(const peer_id_t peer_id, const std::vector<struct Message>& messages) {}
 
 void print_esp_now_send_info(const struct SendInfo *info) {
     printf(
@@ -232,7 +232,7 @@ void esp_now_recv_task(void* args) {
             }
             std::vector<struct Message> messages;
             bool result = Frame::parse_message(info->payload, messages);
-            peer_link_recv_cb(mac_to_id(info->src_addr), messages);
+            params->callback(mac_to_id(info->src_addr), messages);
             delete info;
         }
     }
@@ -283,7 +283,8 @@ void __esp_now_send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t
     xQueueSend(esp_now_send_cb_status_mailbox, &status, portMAX_DELAY);
 }
 
-void peer_link_task_init(uint8_t channel, peer_id_t peer_id) {
+void peer_link_init(uint8_t channel, domain_t domain, peer_id_t peer_id, receive_cb_t recv_cb) {
+    memcpy(PEER_BASE_MAC.data() + 1, domain.data(), sizeof(domain_t));
     esp_now_mutex = xSemaphoreCreateMutex();
     esp_now_recv_info_queue = xQueueCreate(5, sizeof(struct ReceiveInfo*));
     esp_now_send_cb_status_mailbox = xQueueCreate(1, sizeof(esp_now_send_status_t));
@@ -306,6 +307,7 @@ void peer_link_task_init(uint8_t channel, peer_id_t peer_id) {
     struct ReceiveTaskParams *recv_task_params = new struct ReceiveTaskParams;
     recv_task_params->peer_id = peer_id;
     ESP_ERROR_CHECK(esp_wifi_get_mac(WIFI_IF_STA, recv_task_params->peer_addr.data()));
+    recv_task_params->callback = recv_cb;
 
     xTaskCreate(
         esp_now_recv_task,
