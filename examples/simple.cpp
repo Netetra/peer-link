@@ -3,6 +3,7 @@
 #include <cstring>
 
 const uint8_t WIFI_CHANNEL = 14;
+const domain_t PEER_DOMAIN = { 'n', 'n', 'c', 't' };
 const peer_id_t FROM_PEER_ID = 0x12;
 const peer_id_t TO_PEER_ID = 0x11;
 
@@ -22,7 +23,9 @@ void peer_link_recv_cb(
   }
 }
 
-void setup() { peer_link_task_init(WIFI_CHANNEL, FROM_PEER_ID); }
+void setup() {
+  peer_link_init(WIFI_CHANNEL, PEER_DOMAIN, FROM_PEER_ID, peer_link_recv_cb);
+}
 
 void loop() {
   if (peer_link_is_peer_exist(TO_PEER_ID)) {
